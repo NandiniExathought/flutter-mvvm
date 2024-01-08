@@ -1,7 +1,10 @@
+import 'package:country_state/view_models/dropdown_view_model.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(ChangeNotifierProvider(
+      create: ((context) => DropdownViewModel()), child: const MyApp()));
 }
 
 class MyApp extends StatelessWidget {
@@ -9,56 +12,17 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
-      home: DropDownWidget(
-        title: 'Country State Selector',
-      ),
+    return  MaterialApp(
+      home: dropDownWidgets(context),
     );
   }
-}
 
-class DropDownWidget extends StatefulWidget {
-  final String title;
-  const DropDownWidget({super.key, required this.title});
+  Widget dropDownWidgets(BuildContext context) {
+    DropdownViewModel model = Provider.of<DropdownViewModel>(context);
 
-  @override
-  State<DropDownWidget> createState() => _DropDownWidgetState();
-}
-
-class _DropDownWidgetState extends State<DropDownWidget> {
-  static String? _country;
-  static String? _state;
-
-  Map<String, List<String>> countryStateMap = {
-    'India': ['Karnataka', 'Kerala', 'TamilNadu'],
-    'USA': ['US1', 'US2']
-  };
-  @override
-  void initState() {
-    super.initState();
-    _country = countryStateMap.keys.toList()[0];
-    _state = countryStateMap[_country]?[0];
-
-  }
-
-  void handleChangeForCountry(String? newValue) {
-    setState(() {
-      _country = newValue!;
-      _state = countryStateMap[_country]?[0];
-    });
-  }
-
-  void handleChangeForState(String? newValue) {
-                setState(() {
-                  _state = newValue;
-                });
-              }
-
-  @override
-  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.title),
+        title: const Text('Country State Selector'),
       ),
       body: Center(
         child: Column(
@@ -70,9 +34,9 @@ class _DropDownWidgetState extends State<DropDownWidget> {
             ),
             const SizedBox(height: 10),
             DropdownButton<String>(
-              value: _country,
-              onChanged: handleChangeForCountry,
-              items: countryStateMap.keys
+              value: model.country,
+              onChanged: model.handleChangeForCountry,
+              items: model.countryStateMap.keys
                   .map<DropdownMenuItem<String>>((String value) {
                 return DropdownMenuItem<String>(
                   value: value,
@@ -87,9 +51,9 @@ class _DropDownWidgetState extends State<DropDownWidget> {
             ),
             const SizedBox(height: 10),
             DropdownButton<String>(
-              value: _state,
-              onChanged: handleChangeForState,
-              items: countryStateMap[_country]
+              value: model.state,
+              onChanged: model.handleChangeForState,
+              items: model.countryStateMap[model.country]
                   ?.map<DropdownMenuItem<String>>((String value) {
                 return DropdownMenuItem<String>(
                   value: value,
@@ -103,5 +67,3 @@ class _DropDownWidgetState extends State<DropDownWidget> {
     );
   }
 }
-
-
